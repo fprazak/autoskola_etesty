@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
-  final Function(bool) onThemeChanged;
-  final bool isDarkMode;
+  final Function(bool)? onThemeChanged;
+  final bool? isDarkMode;
 
-  const AppDrawer({super.key, required this.onThemeChanged, required this.isDarkMode});
+  const AppDrawer({super.key, this.onThemeChanged, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Dark Mode'),
             trailing: Switch(
-              value: isDarkMode,
+              value: isDarkMode ?? false,
               onChanged: onThemeChanged,
             ),
           ),

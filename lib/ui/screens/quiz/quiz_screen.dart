@@ -104,9 +104,9 @@ class QuizScreenState extends State<QuizScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Quiz Completed"),
+          title: const Text("Výsledky testu"),
           content: Text(
-            "Your score is $_score out of 50.\nYou ${_isPassed ? "passed" : "did not pass"} the exam.",
+            "Dosažený počet bodů $_score z 50.\n${_isPassed ? "Prošel jsi!" : "Neprošel jsi!"}",
           ),
           actions: [
             TextButton(
@@ -176,7 +176,7 @@ class QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Quiz"),
+        title: const Text("Cvičná zkouška"),
       ),
       body: _questions.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -189,7 +189,7 @@ class QuizScreenState extends State<QuizScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "Time Remaining: ${_remainingTime ~/ 60}:${(_remainingTime % 60).toString().padLeft(2, '0')}",
+                      "Zbývající čas: ${_remainingTime ~/ 60}:${(_remainingTime % 60).toString().padLeft(2, '0')}",
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
@@ -204,6 +204,7 @@ class QuizScreenState extends State<QuizScreen> {
                             onPressed: _goToPreviousQuestion,
                             child: const Text("Předchozí"),
                           ),
+                        if (_currentQuestionIndex < _questions.length - 1) const Spacer(),
                         if (_currentQuestionIndex < _questions.length - 1)
                           ElevatedButton(
                             onPressed: _goToNextQuestion,
@@ -315,42 +316,61 @@ class QuestionCard extends StatelessWidget {
               question.question,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            ...question.answers.asMap().entries.map(
-              (entry) {
-                final idx = entry.key;
-                final answer = entry.value;
-                final isSelected = selectedAnswer == idx;
-                final prefix = String.fromCharCode(65 + idx); // 'A', 'B', 'C', etc.
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: InkWell(
-                    onTap: () => onAnswerSelected(idx),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.blue.withOpacity(0.3) : Colors.transparent,
-                        border: Border.all(
-                          color: isSelected ? Colors.blue : Colors.grey,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
+            ...question.answers.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final answer = entry.value;
+              final isSelected = selectedAnswer == idx;
+              final prefix = String.fromCharCode(65 + idx); // 'A', 'B', 'C', etc.
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: GestureDetector(
+                  onTap: () => onAnswerSelected(idx),
+                  child: Row(
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
                         children: [
-                          Expanded(
-                            child: Text(
-                              '$prefix. $answer',
-                              style: TextStyle(
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(width: 2, color: Colors.blueGrey.shade400),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                prefix,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
+                          if (isSelected)
+                            const Positioned(
+                              right: -10.5,
+                              top: 2,
+                              child: Icon(Icons.check, color: Colors.orange, size: 50),
+                            ),
                         ],
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          answer,
+                          style: TextStyle(
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ],
         ),
       ),
